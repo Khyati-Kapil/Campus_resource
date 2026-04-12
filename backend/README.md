@@ -14,5 +14,5 @@ npm run dev
 ## Prisma
 ```bash
 npm run prisma:generate
-npm run prisma:migrate
+npm run prisma:push
 ```
