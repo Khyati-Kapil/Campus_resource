@@ -1,112 +1,130 @@
-# CampusSync ER Diagram
+# Stock Portfolio Risk Analyzer ER Diagram (Revised)
 
 ```mermaid
 erDiagram
     USERS {
-        string id PK
-        string name
+        uuid user_id PK
+        string full_name
         string email UK
-        string password_hash
-        string role "STUDENT|FACULTY|ADMIN"
-        string department
-        string external_id "studentId/facultyId/adminId"
-        boolean is_active
         datetime created_at
-        datetime updated_at
     }
 
-    RESOURCES {
-        string id PK
+    PORTFOLIOS {
+        uuid portfolio_id PK
+        uuid user_id FK
         string name
-        string type "CLASSROOM|LABORATORY|EQUIPMENT"
-        string location
-        int capacity
-        boolean is_active
-        json attributes_json
-        datetime created_at
-        datetime updated_at
-    }
-
-    BOOKINGS {
-        string id PK
-        string resource_id FK
-        string requester_id FK
-        datetime start_time
-        datetime end_time
-        string status "PENDING|APPROVED|REJECTED|CANCELLED"
-        string purpose
-        string slot_key "normalized lock key"
-        int version
-        datetime created_at
-        datetime updated_at
-    }
-
-    APPROVALS {
-        string id PK
-        string booking_id FK
-        string approver_id FK
-        string status "PENDING|APPROVED|REJECTED"
-        int level_order
-        string comment
-        datetime decided_at
+        string base_currency
         datetime created_at
     }
 
-    NOTIFICATIONS {
-        string id PK
-        string user_id FK
-        string booking_id FK
-        string channel "EMAIL|IN_APP"
-        string template_code
-        string status "QUEUED|SENT|FAILED"
-        datetime scheduled_at
-        datetime sent_at
-        int retry_count
-        datetime created_at
+    ASSETS {
+        uuid asset_id PK
+        string ticker UK
+        string name
+        string asset_type "EQUITY|ETF|BOND|CRYPTO"
+        string exchange
+        string currency
     }
 
-    AUDIT_LOGS {
-        string id PK
-        string actor_id FK
-        string action
-        string entity_type
-        string entity_id
-        json metadata_json
-        string request_id
-        datetime created_at
+    TRANSACTIONS {
+        uuid transaction_id PK
+        uuid portfolio_id FK
+        uuid asset_id FK
+        date trade_date
+        string side "BUY|SELL"
+        decimal quantity
+        decimal price
+        decimal fees
     }
 
-    USERS ||--o{ BOOKINGS : "creates"
-    RESOURCES ||--o{ BOOKINGS : "allocated_to"
-    BOOKINGS ||--o{ APPROVALS : "has"
-    USERS ||--o{ APPROVALS : "decides"
-    USERS ||--o{ NOTIFICATIONS : "receives"
-    BOOKINGS ||--o{ NOTIFICATIONS : "triggers"
-    USERS ||--o{ AUDIT_LOGS : "acts_in"
+    HOLDINGS_SNAPSHOT {
+        uuid snapshot_id PK
+        uuid portfolio_id FK
+        uuid asset_id FK
+        date snapshot_date
+        decimal quantity
+        decimal market_value
+        decimal weight
+    }
 
-    %% Logical constraints and indexing guidance
-    %% PK: id on all collections
-    %% FK: enforced in service layer + Prisma relations
-    %% Indexes:
-    %% 1) BOOKINGS(resource_id, start_time, end_time, status)
-    %% 2) BOOKINGS(requester_id, created_at)
-    %% 3) APPROVALS(booking_id, level_order, status)
-    %% 4) NOTIFICATIONS(user_id, status, scheduled_at)
-    %% 5) AUDIT_LOGS(entity_type, entity_id, created_at)
-    %% Unique constraints:
-    %% - USERS(email)
-    %% - RESOURCES(name, location)
-    %% - BOOKINGS(resource_id, slot_key, status_active_flag) to prevent double booking
+    PRICE_HISTORY {
+        uuid price_id PK
+        uuid asset_id FK
+        date price_date
+        decimal close_price
+        decimal adjusted_close
+        bigint volume
+    }
+
+    BENCHMARKS {
+        uuid benchmark_id PK
+        string symbol UK
+        string name
+        string currency
+    }
+
+    BENCHMARK_RETURNS {
+        uuid benchmark_return_id PK
+        uuid benchmark_id FK
+        date return_date
+        decimal daily_return
+    }
+
+    RISK_RUNS {
+        uuid risk_run_id PK
+        uuid portfolio_id FK
+        date as_of_date
+        string frequency "DAILY|WEEKLY|MONTHLY"
+        int lookback_days
+        string method "HISTORICAL|PARAMETRIC|MONTE_CARLO"
+        datetime computed_at
+    }
+
+    RISK_METRICS {
+        uuid metric_id PK
+        uuid risk_run_id FK
+        decimal portfolio_value
+        decimal volatility
+        decimal beta
+        decimal sharpe_ratio
+        decimal var_95
+        decimal cvar_95
+        decimal max_drawdown
+    }
+
+    STRESS_SCENARIOS {
+        uuid scenario_id PK
+        string name
+        string shock_type "MARKET|SECTOR|ASSET"
+        decimal shock_percent
+    }
+
+    STRESS_RESULTS {
+        uuid stress_result_id PK
+        uuid risk_run_id FK
+        uuid scenario_id FK
+        decimal projected_pnl
+        decimal projected_drawdown
+    }
+
+    USERS ||--o{ PORTFOLIOS : owns
+    PORTFOLIOS ||--o{ TRANSACTIONS : records
+    ASSETS ||--o{ TRANSACTIONS : traded_in
+    PORTFOLIOS ||--o{ HOLDINGS_SNAPSHOT : captures
+    ASSETS ||--o{ HOLDINGS_SNAPSHOT : valued_as
+    ASSETS ||--o{ PRICE_HISTORY : has_prices
+    BENCHMARKS ||--o{ BENCHMARK_RETURNS : has_returns
+    PORTFOLIOS ||--o{ RISK_RUNS : evaluated_by
+    RISK_RUNS ||--|| RISK_METRICS : outputs
+    RISK_RUNS ||--o{ STRESS_RESULTS : stress_tested
+    STRESS_SCENARIOS ||--o{ STRESS_RESULTS : defines
 ```
 
-## Constraints and Indexing Notes
-- `USERS.email` must be unique.
-- `BOOKINGS` must enforce `start_time < end_time`.
-- Active overlap prevention:
-  - App-level overlap query on `PENDING` and `APPROVED`.
-  - Unique partial index idea: `(resource_id, slot_key)` where status in active states.
-- Query-performance indexes:
-  - `BOOKINGS(resource_id, start_time, end_time, status)`
-  - `BOOKINGS(requester_id, created_at desc)`
-  - `APPROVALS(booking_id, level_order)`
-  - `AUDIT_LOGS(entity_type, entity_id, created_at desc)`
+## Notes
+- Prefer calculating holdings from `TRANSACTIONS`; `HOLDINGS_SNAPSHOT` is for fast reads/reporting.
+- Enforce unique keys:
+  - `USERS.email`
+  - `ASSETS.ticker`
+  - `PRICE_HISTORY(asset_id, price_date)`
+  - `BENCHMARK_RETURNS(benchmark_id, return_date)`
+- Store one `RISK_METRICS` row per `RISK_RUNS` row.

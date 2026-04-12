@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  FACULTY
+  ADMIN
+}
+
+enum ResourceType {
+  CLASSROOM
+  LABORATORY
+  EQUIPMENT
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  department   String?
+  externalId   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings      Booking[]      @relation("UserBookings")
+  approvals     Approval[]     @relation("UserApprovals")
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+model Resource {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  type       ResourceType
+  location   String
+  capacity   Int
+  isActive   Boolean  @default(true)
+  attributes Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@index([name, location])
+}
+
+model Booking {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  resourceId  String        @db.ObjectId
+  requesterId String        @db.ObjectId
+  startTime   DateTime
+  endTime     DateTime
+  status      BookingStatus @default(PENDING)
+  purpose     String?
+  slotKey     String
+  version     Int           @default(1)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  resource  Resource @relation(fields: [resourceId], references: [id])
+  requester User     @relation("UserBookings", fields: [requesterId], references: [id])
+  approvals Approval[]
+  notifications Notification[]
+
+  @@index([resourceId, startTime, endTime, status])
+  @@index([requesterId, createdAt])
+}
+
+model Approval {
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
+  bookingId  String         @db.ObjectId
+  approverId String         @db.ObjectId
+  status     ApprovalStatus @default(PENDING)
+  levelOrder Int            @default(1)
+  comment    String?
+  decidedAt  DateTime?
+  createdAt  DateTime       @default(now())
+
+  booking  Booking @relation(fields: [bookingId], references: [id])
+  approver User    @relation("UserApprovals", fields: [approverId], references: [id])
+
+  @@index([bookingId, levelOrder, status])
+}
+
+model Notification {
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String             @db.ObjectId
+  bookingId   String?            @db.ObjectId
+  channel     NotificationChannel
+  template    String
+  status      NotificationStatus @default(QUEUED)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  retryCount  Int                @default(0)
+  createdAt   DateTime           @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@index([userId, status, scheduledAt])
+}
+
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  actorId   String   @db.ObjectId
+  action    String
+  entityType String
+  entityId  String
+  metadata  Json?
+  requestId String?
+  createdAt DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId, createdAt])
+}
