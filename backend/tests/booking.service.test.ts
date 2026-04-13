@@ -16,12 +16,24 @@ describe("BookingService", () => {
     const conflictService = {
       checkConflict: vi.fn().mockResolvedValue(true)
     };
+    const resourceRepo = {
+      findById: vi.fn().mockResolvedValue({ id: "r1", type: "CLASSROOM" })
+    };
+    const policyService = {
+      evaluate: vi.fn().mockReturnValue("MANUAL")
+    };
     const eventBus = {
       publish: vi.fn().mockResolvedValue(undefined)
     };
 
     const { BookingService } = await import("../src/services/booking.service.js");
-    const service = new BookingService({ repo: repo as any, conflictService: conflictService as any, eventBus: eventBus as any });
+    const service = new BookingService({
+      repo: repo as any,
+      conflictService: conflictService as any,
+      resourceRepo: resourceRepo as any,
+      policyService: policyService as any,
+      eventBus: eventBus as any
+    });
 
     await expect(
       service.create({ resourceId: "r1", startTime: new Date().toISOString(), endTime: new Date(Date.now() + 3600000).toISOString() }, { id: "u1", role: "STUDENT" })
@@ -36,10 +48,18 @@ describe("BookingService", () => {
       cancel: vi.fn()
     };
     const conflictService = { checkConflict: vi.fn().mockResolvedValue(false) };
+    const resourceRepo = { findById: vi.fn().mockResolvedValue({ id: "r1", type: "CLASSROOM" }) };
+    const policyService = { evaluate: vi.fn().mockReturnValue("MANUAL") };
     const eventBus = { publish: vi.fn().mockResolvedValue(undefined) };
 
     const { BookingService } = await import("../src/services/booking.service.js");
-    const service = new BookingService({ repo: repo as any, conflictService: conflictService as any, eventBus: eventBus as any });
+    const service = new BookingService({
+      repo: repo as any,
+      conflictService: conflictService as any,
+      resourceRepo: resourceRepo as any,
+      policyService: policyService as any,
+      eventBus: eventBus as any
+    });
 
     const result = await service.list({ page: "2", pageSize: "10" }, { id: "u1", role: "STUDENT" });
     expect(result.page).toBe(2);

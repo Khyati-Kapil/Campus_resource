@@ -8,6 +8,7 @@ export type BookingRecord = {
   endTime: Date;
   status: BookingStatus;
   version: number;
+  purpose?: string | null;
 };
 
 export interface BookingRepositoryInterface {

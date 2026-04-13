@@ -13,6 +13,10 @@ export class ResourceRepository {
     return prisma.resource.findMany({ orderBy: { createdAt: "desc" } });
   }
 
+  async findById(id: string) {
+    return prisma.resource.findUnique({ where: { id } });
+  }
+
   async create(data: ResourceCreateInput) {
     return prisma.resource.create({ data });
   }

@@ -20,6 +20,7 @@ export class BookingRepository implements BookingRepositoryInterface {
         startTime: data.startTime,
         endTime: data.endTime,
         status: data.status,
+        purpose: data.purpose ?? null,
         slotKey: `${data.resourceId}:${data.startTime.toISOString()}:${data.endTime.toISOString()}`
       }
     });
@@ -31,7 +32,8 @@ export class BookingRepository implements BookingRepositoryInterface {
       startTime: created.startTime,
       endTime: created.endTime,
       status: created.status as BookingStatus,
-      version: created.version
+      version: created.version,
+      purpose: created.purpose ?? null
     };
   }
 
@@ -46,7 +48,8 @@ export class BookingRepository implements BookingRepositoryInterface {
       startTime: found.startTime,
       endTime: found.endTime,
       status: found.status as BookingStatus,
-      version: found.version
+      version: found.version,
+      purpose: found.purpose ?? null
     };
   }
 
@@ -72,7 +75,8 @@ export class BookingRepository implements BookingRepositoryInterface {
       startTime: item.startTime,
       endTime: item.endTime,
       status: item.status as BookingStatus,
-      version: item.version
+      version: item.version,
+      purpose: item.purpose ?? null
     }));
   }
 
@@ -107,7 +111,8 @@ export class BookingRepository implements BookingRepositoryInterface {
         startTime: item.startTime,
         endTime: item.endTime,
         status: item.status as BookingStatus,
-        version: item.version
+        version: item.version,
+        purpose: item.purpose ?? null
       })),
       total
     };
@@ -126,7 +131,8 @@ export class BookingRepository implements BookingRepositoryInterface {
       startTime: updated.startTime,
       endTime: updated.endTime,
       status: updated.status as BookingStatus,
-      version: updated.version
+      version: updated.version,
+      purpose: updated.purpose ?? null
     };
   }
 
