@@ -13,3 +13,8 @@ export const cancelBooking = async (req: Request, res: Response) => {
   const result = await bookingService.cancel(req.params.id, req.user);
   return res.json(ok(result));
 };
+
+export const listBookings = async (req: Request, res: Response) => {
+  const result = await bookingService.list(req.query, req.user);
+  return res.json(ok(result));
+};

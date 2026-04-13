@@ -1,6 +1,16 @@
 import { prisma } from "../config/prisma.js";
 import { BookingRepositoryInterface, BookingRecord, BookingStatus } from "../interfaces/booking-repository.interface.js";
 
+export type BookingListFilters = {
+  status?: BookingStatus;
+  resourceId?: string;
+  requesterId?: string;
+  from?: Date;
+  to?: Date;
+  skip?: number;
+  take?: number;
+};
+
 export class BookingRepository implements BookingRepositoryInterface {
   async create(data: Omit<BookingRecord, "id" | "version">): Promise<BookingRecord> {
     const created = await prisma.booking.create({
@@ -64,6 +74,43 @@ export class BookingRepository implements BookingRepositoryInterface {
       status: item.status as BookingStatus,
       version: item.version
     }));
+  }
+
+  async list(filters: BookingListFilters) {
+    const where: Record<string, unknown> = {};
+
+    if (filters.status) where.status = filters.status;
+    if (filters.resourceId) where.resourceId = filters.resourceId;
+    if (filters.requesterId) where.requesterId = filters.requesterId;
+    if (filters.from || filters.to) {
+      where.startTime = {
+        ...(filters.from ? { gte: filters.from } : {}),
+        ...(filters.to ? { lte: filters.to } : {})
+      };
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.booking.findMany({
+        where,
+        orderBy: { startTime: "asc" },
+        skip: filters.skip,
+        take: filters.take
+      }),
+      prisma.booking.count({ where })
+    ]);
+
+    return {
+      items: items.map((item) => ({
+        id: item.id,
+        resourceId: item.resourceId,
+        requesterId: item.requesterId,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        status: item.status as BookingStatus,
+        version: item.version
+      })),
+      total
+    };
   }
 
   async updateStatus(id: string, status: BookingStatus, version: number): Promise<BookingRecord> {

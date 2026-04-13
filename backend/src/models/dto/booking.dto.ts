@@ -23,3 +23,15 @@ export const decisionSchema = z.object({
     comment: z.string().optional()
   })
 });
+
+export const listBookingsSchema = z.object({
+  query: z.object({
+    status: z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]).optional(),
+    resourceId: z.string().optional(),
+    requesterId: z.string().optional(),
+    from: z.string().optional(),
+    to: z.string().optional(),
+    page: z.coerce.number().int().positive().optional(),
+    pageSize: z.coerce.number().int().positive().max(100).optional()
+  })
+});

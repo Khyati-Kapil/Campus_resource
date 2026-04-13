@@ -59,6 +59,7 @@ model User {
   approvals     Approval[]     @relation("UserApprovals")
   notifications Notification[]
   auditLogs     AuditLog[]
+  refreshTokens RefreshToken[]
 }
 
 model Resource {
@@ -146,4 +147,17 @@ model AuditLog {
   actor User @relation(fields: [actorId], references: [id])
 
   @@index([entityType, entityId, createdAt])
+}
+
+model RefreshToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, expiresAt])
 }

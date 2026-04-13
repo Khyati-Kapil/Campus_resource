@@ -16,3 +16,8 @@ npm run dev
 npm run prisma:generate
 npm run prisma:push
 ```
+
+## Tests
+```bash
+npm run test
+```
