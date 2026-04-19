@@ -17,5 +17,5 @@ export const env = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET as string,
   jwtAccessTtl: process.env.JWT_ACCESS_TTL ?? "15m",
   jwtRefreshTtl: process.env.JWT_REFRESH_TTL ?? "7d",
-  corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:3000"
+  corsOrigin: process.env.CORS_ORIGIN ?? "https://campus-resource-arev.vercel.app,http://localhost:3000,http://localhost:5173"
 };
