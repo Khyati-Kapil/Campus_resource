@@ -1,4 +1,6 @@
+import nodemailer from "nodemailer";
 import { NotificationRepository } from "../repositories/notification.repository.js";
+import { env } from "../config/env.js";
 
 export type NotificationRecord = {
   id: string;
@@ -20,8 +22,24 @@ class InAppStrategy implements Strategy {
 }
 
 class EmailStrategy implements Strategy {
-  async send(_notification: NotificationRecord) {
-    return;
+  private transporter = nodemailer.createTransport({
+    host: env.smtpHost,
+    port: env.smtpPort,
+    secure: env.smtpSecure,
+    auth: env.smtpUser && env.smtpPass ? { user: env.smtpUser, pass: env.smtpPass } : undefined
+  });
+
+  async send(notification: NotificationRecord) {
+    if (!env.smtpFrom) {
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: env.smtpFrom,
+      to: env.smtpToFallback,
+      subject: `CampusSync ${notification.template}`,
+      text: `Notification ${notification.template} for booking ${notification.bookingId ?? ""}`
+    });
   }
 }
 

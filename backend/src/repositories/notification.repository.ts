@@ -24,4 +24,18 @@ export class NotificationRepository {
       }
     });
   }
+
+  async listByUser(userId: string, skip?: number, take?: number) {
+    const [items, total] = await Promise.all([
+      prisma.notification.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take
+      }),
+      prisma.notification.count({ where: { userId } })
+    ]);
+
+    return { items, total };
+  }
 }

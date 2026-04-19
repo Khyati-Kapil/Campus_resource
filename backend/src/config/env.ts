@@ -10,6 +10,8 @@ for (const key of required) {
   }
 }
 
+const smtpPort = Number(process.env.SMTP_PORT ?? 587);
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   port: Number(process.env.PORT ?? 4000),
@@ -18,5 +20,12 @@ export const env = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET as string,
   jwtAccessTtl: process.env.JWT_ACCESS_TTL ?? "15m",
   jwtRefreshTtl: process.env.JWT_REFRESH_TTL ?? "7d",
-  corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:3000"
+  corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:3000",
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort,
+  smtpSecure: process.env.SMTP_SECURE === "true",
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPass: process.env.SMTP_PASS ?? "",
+  smtpFrom: process.env.SMTP_FROM ?? "",
+  smtpToFallback: process.env.SMTP_TO_FALLBACK ?? ""
 };

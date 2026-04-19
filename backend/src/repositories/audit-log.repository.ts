@@ -13,4 +13,22 @@ export class AuditLogRepository {
       }
     });
   }
+
+  async list(filters: { entityType?: string; entityId?: string; skip?: number; take?: number }) {
+    const where: Record<string, unknown> = {};
+    if (filters.entityType) where.entityType = filters.entityType;
+    if (filters.entityId) where.entityId = filters.entityId;
+
+    const [items, total] = await Promise.all([
+      prisma.auditLog.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: filters.skip,
+        take: filters.take
+      }),
+      prisma.auditLog.count({ where })
+    ]);
+
+    return { items, total };
+  }
 }
