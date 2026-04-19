@@ -19,13 +19,11 @@ export const BookingsPage = () => {
     const [conflictMessage, setConflictMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
-    // Initial resource selection
     useEffect(() => {
         if (resources.length > 0 && !selectedResourceId) {
             setSelectedResourceId(resources[0].id);
         }
     }, [resources, selectedResourceId]);
-    // Conflict detection
     useEffect(() => {
         if (!token || !selectedResourceId || !startTime || !endTime)
             return;
@@ -68,7 +66,6 @@ export const BookingsPage = () => {
             });
             setSuccessMessage('Booking request submitted successfully!');
             setPurpose('');
-            // Refresh data
             await Promise.all([
                 fetchBookings(token),
                 fetchNotifications(token),

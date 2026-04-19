@@ -2,7 +2,6 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
-// Layout & Pages
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { LandingPage } from "./pages/LandingPage";
 import { AuthPage } from "./pages/AuthPage";
@@ -11,7 +10,6 @@ import { BookingsPage } from "./pages/BookingsPage";
 import { ApprovalsPage } from "./pages/ApprovalsPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import { AuditPage } from "./pages/AuditPage";
-// Stores
 import { useAuthStore } from "./store/useAuthStore";
 import { useAppStore } from "./store/useAppStore";
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000/api";
@@ -20,7 +18,6 @@ export default function App() {
     const { fetchResources, fetchBookings, fetchNotifications, fetchAdminData, addNotification } = useAppStore();
     const location = useLocation();
     const isAdmin = user?.role === "ADMIN";
-    // Socket.io for Real-time
     useEffect(() => {
         if (!token)
             return;
@@ -34,7 +31,6 @@ export default function App() {
             socket.disconnect();
         };
     }, [token, addNotification]);
-    // Initial Data Load
     useEffect(() => {
         if (!token)
             return;
@@ -45,7 +41,6 @@ export default function App() {
             void fetchAdminData(token, true);
         }
     }, [token, isAdmin, fetchResources, fetchBookings, fetchNotifications, fetchAdminData]);
-    // Protected Route Wrapper
     const ProtectedRoute = ({ children, requiredRole }) => {
         if (!token)
             return _jsx(Navigate, { to: "/auth", state: { from: location }, replace: true });

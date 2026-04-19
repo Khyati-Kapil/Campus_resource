@@ -1,139 +1,158 @@
 # CampusSync
 
-**Neo-Brutalist Campus Resource Management Platform**
+**Campus Resource Management Platform**
 
-🔗 **Deployed Link**: [https://campus-resource-brown.vercel.app/](https://campus-resource-brown.vercel.app/)
+🔗 **Deployed Link**: https://campus-resource-arev.vercel.app/
 
-CampusSync is a high-contrast, neo-brutalist SaaS application for managing campus rooms, labs, and equipment. It provides a clean, purpose-driven UI with solid color blocks, bold typography, and an intuitive navigation system (sidebar, navbar, footer) designed for fast, frictionless resource booking and approval workflows.
-
----
-
-## ✨ Features
-- **Unified Resource Catalog** – Browse and search classrooms, laboratories, and equipment.
-- **Real-time Conflict Detection** – Automatic checks to prevent double-booking.
-- **Approval Workflow** – Faculty/administrators can approve or reject requests with audit logs.
-- **Analytics Dashboard** – Visualize usage, peak hours, and conflict statistics.
-- **Responsive Neo-Brutalist UI** – Black background with teal, lime, and lavender accents, solid blocks, and bold uppercase typography.
-- **Toast Notifications** – Immediate feedback for actions and errors.
-- **Dark-mode ready** – Designed for high-contrast environments.
+CampusSync is a full-stack SaaS application for managing campus rooms, labs, and equipment. It features real-time conflict detection, role-based approval workflows, and an analytics dashboard for institutional resource governance.
 
 ---
 
-## 🛠️ Tech Stack
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Framer Motion
-- **Backend**: Node.js, Express, TypeScript, Prisma ORM
-- **Database**: PostgreSQL (or any Prisma-compatible DB)
-- **Authentication**: JWT based auth with role-based access (Student, Faculty, Admin)
-- **Deployment**: Vercel (frontend), Railway/Render (backend)
+##  Features
+- **Resource Catalog** – Browse and search classrooms, laboratories, and equipment.
+- **Real-time Conflict Detection** – Automatic scheduling overlap checks before booking.
+- **Approval Workflow** – Faculty and admins can approve or reject booking requests.
+- **Audit Logs** – Immutable record of every system action for governance.
+- **Analytics Dashboard** – Usage patterns, peak hours, and conflict statistics.
+- **Real-time Notifications** – WebSocket-powered alerts for booking status changes.
+- **Role-Based Access** – Distinct permissions for Students, Faculty, and Admins.
 
 ---
 
-## 📦 Installation
+##  Tech Stack
+
+### Frontend
+- React 18 + TypeScript
+- Vite 5
+- Tailwind CSS 4
+- Framer Motion (animations)
+- Zustand (state management)
+- Recharts (data visualization)
+- Socket.io Client (real-time)
+- Lucide React (icons)
+
+### Backend
+- Node.js + Express 4
+- TypeScript
+- Prisma ORM
+- Socket.io (WebSocket)
+- Zod (validation)
+- bcryptjs + JWT (auth)
+- Helmet + CORS (security)
+- Vitest + Supertest (testing)
+
+---
+
+##  Installation
 
 ### Backend
 ```bash
 cd backend
 npm install
-cp .env.example .env  # configure DATABASE_URL and JWT secrets
-npm run prisma:generate   # generate Prisma client
-npm run prisma:push       # push schema to DB (or migrate)
-npm run dev               # start server on http://localhost:4000
+cp .env.example .env
+npm run prisma:generate
+npm run prisma:push
+npm run dev
 ```
 
 ### Frontend
 ```bash
 cd frontend
 npm install
-npm run dev               # start dev server on http://localhost:3000
+npm run dev
 ```
 
 ---
 
-## 🚀 Running Locally
+##  Environment Variables
 
-Both backend and frontend can be started in parallel.
+Create a `.env` in `backend/` based on `.env.example`:
 
-```bash
-# Terminal 1
-cd backend && npm run dev
+| Variable | Description | Default |
+|---|---|---|
+| `NODE_ENV` | Environment mode | `development` |
+| `PORT` | API server port | `4000` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/campussync` |
+| `JWT_ACCESS_SECRET` | Secret for signing access tokens | — |
+| `JWT_REFRESH_SECRET` | Secret for signing refresh tokens | — |
+| `JWT_ACCESS_TTL` | Access token expiry | `15m` |
+| `JWT_REFRESH_TTL` | Refresh token expiry | `7d` |
+| `CORS_ORIGIN` | Allowed frontend origin | `http://localhost:3000` |
 
-# Terminal 2
-cd frontend && npm run dev
-```
+Frontend env (optional):
 
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` in the `backend/` directory based on `.env.example`:
-
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET` | Secret for signing JWTs |
-| `PORT` | API server port (default: 4000) |
+| Variable | Description | Default |
+|---|---|---|
+| `VITE_API_BASE` | Backend API URL | `http://localhost:4000/api` |
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
-├── backend/          # Express server, Prisma schema, API routes
-├── frontend/         # React Vite app, UI components, stores
-├── ErDiagram.md      # Entity-Relationship diagram
-├── classDiagram.md   # Class diagram
-├── sequenceDiagram.md # Sequence diagram
-├── useCaseDiagram.md # Use-case diagram
+├── backend/
+│   └── src/saas/
+│       ├── routes/         # auth, bookings, resources, analytics, audit, notifications
+│       ├── services/       # business logic
+│       ├── middlewares/     # auth, role guards, error handling
+│       ├── config/         # env, db, logger
+│       ├── app.ts          # Express app factory
+│       └── server.ts       # Entry point
+├── frontend/
+│   └── src/
+│       ├── pages/          # Landing, Auth, Dashboard, Bookings, Approvals, Audit, Resources
+│       ├── components/     # UI components, layout
+│       ├── store/          # Zustand stores (auth, app)
+│       ├── services/       # API client
+│       └── types/          # TypeScript interfaces
+├── ErDiagram.md
+├── classDiagram.md
+├── sequenceDiagram.md
+├── useCaseDiagram.md
 └── README.md
 ```
 
 ---
 
-## 📊 API Reference
+##  API Reference
 
-| Method | Endpoint | Description | Auth |
-|---|---|---|---|
-| `POST` | `/auth/login` | User login, returns JWT | Public |
-| `POST` | `/auth/register` | Register new user | Public |
-| `GET` | `/resources` | List all resources | Token |
-| `GET` | `/bookings` | List bookings for current user | Token |
-| `POST` | `/bookings` | Create a booking (conflict check) | Token |
-| `GET` | `/bookings/conflicts/check` | Check for scheduling conflicts | Token |
-| `GET` | `/analytics/usage` | Usage statistics | Admin |
-| `GET` | `/audit` | Audit logs | Admin |
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/auth/register` | Register a new user |
+| `POST` | `/api/auth/login` | Login, returns JWT |
+
+### Resources
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/resources` | List all campus resources |
+
+### Bookings
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/bookings` | List current user's bookings |
+| `POST` | `/api/bookings` | Create a new booking |
+| `GET` | `/api/bookings/conflicts/check` | Check for scheduling conflicts |
+| `PATCH` | `/api/bookings/:id/approve` | Approve a booking (Faculty/Admin) |
+| `PATCH` | `/api/bookings/:id/reject` | Reject a booking (Faculty/Admin) |
+| `PATCH` | `/api/bookings/:id/cancel` | Cancel a booking |
+
+### Analytics & Audit
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/analytics/usage` | Usage statistics (Admin) |
+| `GET` | `/api/audit` | Audit logs (Admin) |
+| `GET` | `/api/notifications` | User notifications |
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 cd backend
 npm run test
 ```
 
----
 
-## 🎨 Design Guidelines
 
-| Element | Specification |
-|---|---|
-| **Palette** | Black, Teal `#14b8a6`, Lime `#84cc16`, Lavender `#a78bfa` |
-| **Typography** | Bold, uppercase headings (Inter/Outfit) |
-| **Components** | Solid blocks, thick borders, no gradients or glassmorphism |
-| **Animations** | Framer Motion for transitions and hover effects |
-| **Navigation** | Fixed top navbar, collapsible sidebar, scrollable footer |
 
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feat/awesome-feature`)
-3. Ensure code follows existing style (TS lint, Prettier)
-4. Submit a pull request with a clear description
-
----
-
-## 📜 License
-
-MIT License – see `LICENSE` file for details.

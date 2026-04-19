@@ -25,7 +25,7 @@ export const ApprovalsPage = () => {
             return;
         const reason = window.prompt(`Please provide a reason for ${action === 'approve' ? 'approval' : 'rejection'}:`, action === 'approve' ? 'Meets facility usage policy' : 'Resource unavailable for this time');
         if (reason === null)
-            return; // User cancelled
+            return;
         setProcessingId(id);
         try {
             await apiRequest(`/bookings/${id}/${action}`, {
@@ -33,7 +33,6 @@ export const ApprovalsPage = () => {
                 headers: getAuthHeaders(token),
                 body: JSON.stringify({ reason })
             });
-            // Refresh
             await Promise.all([
                 fetchBookings(token),
                 fetchNotifications(token),
