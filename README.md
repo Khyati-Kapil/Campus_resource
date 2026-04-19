@@ -2,7 +2,7 @@
 
 **Campus Resource Management Platform**
 
-🔗 **Deployed Link**: https://campus-resource-arev.vercel.app/
+🔗 **Deployed Link**: [https://campus-resource-arev.vercel.app/](https://campus-resource-arev.vercel.app/)
 
 CampusSync is a full-stack SaaS application for managing campus rooms, labs, and equipment. It features real-time conflict detection, role-based approval workflows, and an analytics dashboard for institutional resource governance.
 
