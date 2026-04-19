@@ -30,7 +30,7 @@ const fadeInUp = {
 export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-[#14b8a6] selection:text-black font-sans">
-      {/* SOLID NAVIGATION */}
+
       <header className="fixed top-0 left-0 right-0 z-50 h-20 bg-black border-b-4 border-zinc-900 px-6 lg:px-12 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#14b8a6] flex items-center justify-center">
@@ -60,7 +60,7 @@ export const LandingPage = () => {
       </header>
 
       <main className="pt-20">
-        {/* HERO SECTION */}
+
         <section className="container mx-auto px-6 pt-32 pb-48 border-b-8 border-zinc-900">
           <div className="grid lg:grid-cols-12 gap-20 items-center">
             <div className="lg:col-span-8">
@@ -118,7 +118,7 @@ export const LandingPage = () => {
           </div>
         </section>
 
-        {/* CORE UTILITY (SOLID BENTO) */}
+
         <section id="resources" className="container mx-auto px-6 py-40 border-b-8 border-zinc-900">
            <div className="text-center mb-24">
               <h2 className="text-5xl lg:text-7xl font-black uppercase leading-[0.9] mb-8">Unified <span className="text-[#a78bfa]">Governance</span></h2>
@@ -146,7 +146,7 @@ export const LandingPage = () => {
            </div>
         </section>
 
-        {/* WORKFLOW ENGINE */}
+
         <section id="workflow" className="container mx-auto px-6 py-40 bg-zinc-950">
            <div className="flex flex-col lg:flex-row gap-24 items-center max-w-7xl mx-auto">
               <div className="lg:w-1/2">
@@ -185,7 +185,7 @@ export const LandingPage = () => {
            </div>
         </section>
 
-        {/* FINAL DEPLOYMENT CTA */}
+
         <section className="container mx-auto px-6 py-48 text-center">
            <div className="bg-[#14b8a6] rounded-[5rem] p-24 lg:p-40 flex flex-col items-center text-black">
               <h2 className="text-6xl lg:text-[9rem] font-black mb-16 leading-[0.8] tracking-tighter uppercase">Deploy <br /> Now.</h2>
@@ -204,7 +204,7 @@ export const LandingPage = () => {
         </section>
       </main>
 
-      {/* SOLID FOOTER */}
+
       <footer className="border-t-8 border-zinc-900 py-32 bg-black">
          <div className="container mx-auto px-6 lg:px-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 mb-32">

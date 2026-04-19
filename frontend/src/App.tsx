@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 
-// Layout & Pages
+
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { LandingPage } from "./pages/LandingPage";
 import { AuthPage } from "./pages/AuthPage";
@@ -12,7 +12,7 @@ import { ApprovalsPage } from "./pages/ApprovalsPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
 import { AuditPage } from "./pages/AuditPage";
 
-// Stores
+
 import { useAuthStore } from "./store/useAuthStore";
 import { useAppStore } from "./store/useAppStore";
 
@@ -31,7 +31,7 @@ export default function App() {
   const location = useLocation();
   const isAdmin = user?.role === "ADMIN";
 
-  // Socket.io for Real-time
+
   useEffect(() => {
     if (!token) return;
     
@@ -48,7 +48,7 @@ export default function App() {
     };
   }, [token, addNotification]);
 
-  // Initial Data Load
+
   useEffect(() => {
     if (!token) return;
 
@@ -61,7 +61,7 @@ export default function App() {
     }
   }, [token, isAdmin, fetchResources, fetchBookings, fetchNotifications, fetchAdminData]);
 
-  // Protected Route Wrapper
+
   const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: string }) => {
     if (!token) return <Navigate to="/auth" state={{ from: location }} replace />;
     if (requiredRole && user?.role !== requiredRole && user?.role !== 'ADMIN') {
@@ -72,16 +72,16 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public Routes */}
+
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
 
-      {/* Dashboard Routes (Protected) */}
+
       <Route path="/overview" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
       <Route path="/resources" element={<ProtectedRoute><ResourcesPage /></ProtectedRoute>} />
       
-      {/* Role-Specific Routes */}
+
       <Route 
         path="/approvals" 
         element={
@@ -99,7 +99,7 @@ export default function App() {
         } 
       />
 
-      {/* Fallback */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

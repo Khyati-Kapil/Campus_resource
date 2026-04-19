@@ -2,7 +2,7 @@
 
 A modern, high-performance SaaS dashboard for managing institutional resources with real-time governance.
 
-## 🚀 Tech Stack
+##  Tech Stack
 - **Frontend:** React + Vite + TypeScript
 - **Styling:** Tailwind CSS (Modern Dark Mode)
 - **Animations:** Framer Motion
@@ -10,7 +10,7 @@ A modern, high-performance SaaS dashboard for managing institutional resources w
 - **Real-time:** Socket.io-client
 - **Charts:** Recharts
 
-## 🛠️ Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js & npm
@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-## ✨ Features
+##  Features
 - **High-Conversion Landing Page:** Animated product preview and feature grid.
 - **Smart Dashboard:** KPI metrics, usage analytics, and recent activity feed.
 - **Conflict-Safe Booking:** Real-time overlap detection during resource scheduling.

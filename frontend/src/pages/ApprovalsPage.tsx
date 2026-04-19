@@ -43,7 +43,7 @@ export const ApprovalsPage = () => {
       action === 'approve' ? 'Meets facility usage policy' : 'Resource unavailable for this time'
     );
 
-    if (reason === null) return; // User cancelled
+    if (reason === null) return;
 
     setProcessingId(id);
     try {
@@ -53,7 +53,7 @@ export const ApprovalsPage = () => {
         body: JSON.stringify({ reason })
       });
       
-      // Refresh
+
       await Promise.all([
         fetchBookings(token),
         fetchNotifications(token),
@@ -90,7 +90,7 @@ export const ApprovalsPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
+
       <div className="flex gap-2 p-1 bg-accent/30 rounded-xl w-fit">
         {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((tab) => (
           <button
@@ -118,7 +118,7 @@ export const ApprovalsPage = () => {
           return (
             <Card key={booking.id} className="group overflow-hidden border-border/50 hover:border-primary/30 transition-all">
               <div className="flex flex-col lg:flex-row items-stretch">
-                {/* Status Indicator Bar */}
+
                 <div className={`w-1 lg:w-1.5 shrink-0 ${
                   booking.status === 'APPROVED' ? 'bg-emerald-500' :
                   booking.status === 'REJECTED' ? 'bg-destructive' :

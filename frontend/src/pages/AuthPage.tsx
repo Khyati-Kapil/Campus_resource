@@ -48,10 +48,9 @@ export const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex selection:bg-[#14b8a6] selection:text-black bg-black text-white relative overflow-hidden">
-      {/* SOLID BACKGROUND */}
-      <div className="fixed inset-0 -z-10 bg-black" />
 
-      {/* Left Side: Branding */}
+
+
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-20 relative">
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
@@ -98,7 +97,7 @@ export const AuthPage = () => {
         <p className="text-[10px] font-black text-zinc-800 uppercase tracking-[0.5em]">© 2026 CampusSync OS</p>
       </div>
 
-      {/* Right Side: Auth Form */}
+
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-20">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

@@ -70,7 +70,7 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      {/* KPI CARDS */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
           <div key={stat.label} className={`p-6 rounded-2xl bg-white/5 border ${stat.border} hover:bg-white/[0.08] transition-all group cursor-pointer`}>
@@ -89,7 +89,7 @@ export const DashboardPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* CHART AREA */}
+
         <div className="lg:col-span-2 p-8 rounded-2xl bg-white/5 border border-white/10">
            <div className="flex justify-between items-center mb-10">
               <div>
@@ -142,7 +142,7 @@ export const DashboardPage = () => {
            </div>
         </div>
 
-        {/* RECENT ACTIVITY */}
+
         <div className="p-8 rounded-2xl bg-white/5 border border-white/10 flex flex-col h-full">
            <h3 className="text-lg font-bold mb-8">Recent Activity</h3>
            <div className="space-y-8 flex-1">

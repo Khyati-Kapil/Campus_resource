@@ -34,14 +34,14 @@ export const BookingsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Initial resource selection
+
   useEffect(() => {
     if (resources.length > 0 && !selectedResourceId) {
       setSelectedResourceId(resources[0].id);
     }
   }, [resources, selectedResourceId]);
 
-  // Conflict detection
+
   useEffect(() => {
     if (!token || !selectedResourceId || !startTime || !endTime) return;
     
@@ -91,7 +91,7 @@ export const BookingsPage = () => {
       setSuccessMessage('Booking request submitted successfully!');
       setPurpose('');
       
-      // Refresh data
+
       await Promise.all([
         fetchBookings(token),
         fetchNotifications(token),
@@ -107,7 +107,7 @@ export const BookingsPage = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Booking Form */}
+
       <div className="lg:col-span-1 space-y-8">
         <Card className="border-primary/20 shadow-xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
@@ -165,7 +165,7 @@ export const BookingsPage = () => {
                 />
               </div>
 
-              {/* Conflict Alert */}
+
               {conflictStatus !== 'idle' && (
                 <div className={`p-4 rounded-lg flex items-start gap-3 text-sm transition-all ${
                   conflictStatus === 'checking' ? 'bg-accent/30 text-muted-foreground animate-pulse' :
@@ -213,7 +213,7 @@ export const BookingsPage = () => {
         </Card>
       </div>
 
-      {/* Bookings List/Calendar Visualization */}
+
       <div className="lg:col-span-2 space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold tracking-tight">Your Bookings</h2>

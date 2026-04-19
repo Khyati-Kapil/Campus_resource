@@ -54,7 +54,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
   return (
     <div className="min-h-screen bg-black flex text-white selection:bg-[#14b8a6] selection:text-black">
-      {/* SIDEBAR */}
+
       <aside
         className={`relative z-30 bg-[#111111] border-r-8 border-black transition-all duration-300 ${
           isSidebarOpen ? 'w-80' : 'w-24'
@@ -105,7 +105,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
            )}
         </div>
         
-        {/* TOGGLE */}
+
         <button 
           onClick={() => setSidebarOpen(!isSidebarOpen)}
           className="absolute -right-5 top-12 w-10 h-10 bg-white border-4 border-black rounded-2xl flex items-center justify-center text-black shadow-2xl hover:scale-110 transition-transform z-50"
@@ -114,9 +114,9 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         </button>
       </aside>
 
-      {/* MAIN */}
+
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* NAVBAR */}
+
         <header className="h-28 flex items-center justify-between px-16 border-b-8 border-black bg-[#111111]">
            <div className="flex items-center gap-10 flex-1">
               <div className="relative max-w-xl w-full">
@@ -140,7 +140,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
            </div>
         </header>
 
-        {/* CONTENT */}
+
         <div className="flex-1 overflow-y-auto p-16 bg-black">
            <motion.div
              initial={{ opacity: 0, y: 20 }}
