@@ -16,7 +16,7 @@ export const createApp = () => {
   const app = express();
 
   app.use(helmet());
-  app.use(cors({ origin: env.corsOrigin, credentials: true }));
+  app.use(cors({ origin: true, credentials: true })); 
   app.use(morgan("dev"));
   app.use(express.json());
   app.use(requestContext);
