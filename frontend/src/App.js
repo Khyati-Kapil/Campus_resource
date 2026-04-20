@@ -12,7 +12,11 @@ import { ResourcesPage } from "./pages/ResourcesPage";
 import { AuditPage } from "./pages/AuditPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useAppStore } from "./store/useAppStore";
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:4000/api";
+const API_BASE = (() => {
+    const raw = import.meta.env.VITE_API_BASE?.trim();
+    const base = raw && raw.length > 0 ? raw : "http://localhost:4000/api";
+    return base.endsWith("/") ? base.slice(0, -1) : base;
+})();
 export default function App() {
     const { token, user } = useAuthStore();
     const { fetchResources, fetchBookings, fetchNotifications, fetchAdminData, addNotification } = useAppStore();

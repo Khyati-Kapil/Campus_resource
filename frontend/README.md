@@ -16,6 +16,13 @@ A modern, high-performance SaaS dashboard for managing institutional resources w
 - Node.js & npm
 - Backend server running (see `../backend/README.md`)
 
+### Environment
+Set the API base URL (required for deployments like Vercel):
+
+- `VITE_API_BASE` = `https://<your-backend-host>/api`
+
+If `VITE_API_BASE` is missing/empty in production, the app may call `/auth/login` or `/auth/register` on the frontend domain (HTML 404), which shows up as JSON parse errors in the UI.
+
 ### Installation
 ```bash
 cd frontend

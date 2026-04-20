@@ -23,6 +23,19 @@ export const AuthPage = () => {
   const [role, setRole] = useState<'STUDENT' | 'FACULTY' | 'ADMIN'>('STUDENT');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const deploymentWarning = (() => {
+    if (typeof window === 'undefined') return '';
+    const host = window.location.hostname;
+    const isRemote = host !== 'localhost' && host !== '127.0.0.1';
+    const raw = (import.meta.env.VITE_API_BASE as string | undefined)?.trim() ?? '';
+    const missing = raw.length === 0;
+    const localApi = raw.includes('localhost') || raw.includes('127.0.0.1');
+    if (!isRemote) return '';
+    if (missing) return 'Backend URL is not set. Configure Vercel env var VITE_API_BASE to your backend URL ending with /api.';
+    if (localApi) return 'Backend URL points to localhost. Update Vercel env var VITE_API_BASE to your deployed backend URL ending with /api.';
+    return '';
+  })();
   
   const { login, signup } = useAuthStore();
   const navigate = useNavigate();
@@ -116,6 +129,16 @@ export const AuthPage = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
+                {deploymentWarning && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-5 bg-amber-900/10 border-4 border-amber-900/30 rounded-[1.5rem] flex items-center gap-4 text-amber-300 text-xs font-black uppercase tracking-widest"
+                  >
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    {deploymentWarning}
+                  </motion.div>
+                )}
                 <AnimatePresence mode="wait">
                   {!isLogin && (
                     <motion.div
