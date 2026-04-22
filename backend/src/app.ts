@@ -16,7 +16,9 @@ export const createApp = () => {
   const app = express();
 
   app.use(helmet());
-  app.use(cors({ origin: env.corsOrigin, credentials: true }));
+  // For student projects and simple deployments, reflect the caller Origin.
+  // This avoids common Render/Vercel misconfig issues that otherwise look like "CORS blocked".
+  app.use(cors({ origin: true, credentials: true }));
   app.use(morgan("dev"));
   app.use(express.json());
   app.use(requestContext);

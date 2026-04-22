@@ -7,7 +7,7 @@ let io: Server | null = null;
 
 export const initSocket = (server: http.Server) => {
   io = new Server(server, {
-    cors: { origin: env.corsOrigin, credentials: true }
+    cors: { origin: true, credentials: true }
   });
 
   io.use((socket, next) => {
@@ -28,4 +28,3 @@ export const initSocket = (server: http.Server) => {
 export const emitToUser = (userId: string, event: string, payload: unknown) => {
   io?.to(`user:${userId}`).emit(event, payload);
 };
-
