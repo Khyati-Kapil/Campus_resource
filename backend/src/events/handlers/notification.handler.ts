@@ -2,6 +2,7 @@ import { DomainEvent } from "../event-bus.js";
 import { NotificationRepository } from "../../repositories/notification.repository.js";
 import { BookingRepository } from "../../repositories/booking.repository.js";
 import { NotificationService } from "../../services/notification.service.js";
+import { emitToUser } from "../../realtime/socket.js";
 
 const notificationRepo = new NotificationRepository();
 const bookingRepo = new BookingRepository();
@@ -29,6 +30,13 @@ export const notificationHandler = async (event: DomainEvent) => {
         template: "BOOKING_CREATED"
       });
       await deliver(inApp);
+      emitToUser(inApp.userId, "notification:new", {
+        id: inApp.id,
+        type: inApp.template,
+        message: "Booking request submitted.",
+        status: inApp.status,
+        createdAt: inApp.createdAt.toISOString()
+      });
     }
     return;
   }
@@ -43,6 +51,13 @@ export const notificationHandler = async (event: DomainEvent) => {
         template: "BOOKING_CANCELLED"
       });
       await deliver(inApp);
+      emitToUser(inApp.userId, "notification:new", {
+        id: inApp.id,
+        type: inApp.template,
+        message: "Booking was cancelled.",
+        status: inApp.status,
+        createdAt: inApp.createdAt.toISOString()
+      });
 
       const email = await notificationRepo.create({
         userId: payload.requesterId,
@@ -70,6 +85,13 @@ export const notificationHandler = async (event: DomainEvent) => {
       template: event.type
     });
     await deliver(inApp);
+    emitToUser(inApp.userId, "notification:new", {
+      id: inApp.id,
+      type: inApp.template,
+      message: event.type === "BOOKING_APPROVED" ? "Booking approved." : "Booking rejected.",
+      status: inApp.status,
+      createdAt: inApp.createdAt.toISOString()
+    });
 
     const email = await notificationRepo.create({
       userId: booking.requesterId,

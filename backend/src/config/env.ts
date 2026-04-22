@@ -12,6 +12,18 @@ for (const key of required) {
 
 const smtpPort = Number(process.env.SMTP_PORT ?? 587);
 
+const parseCorsOrigin = (value: string | undefined) => {
+  if (!value) {
+    return ["https://campus-resource-arev.vercel.app", "http://localhost:3000", "http://localhost:5173"];
+  }
+  const trimmed = value.trim();
+  if (trimmed === "*") return true as const;
+  return trimmed
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   port: Number(process.env.PORT ?? 4000),
@@ -20,7 +32,7 @@ export const env = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET as string,
   jwtAccessTtl: process.env.JWT_ACCESS_TTL ?? "15m",
   jwtRefreshTtl: process.env.JWT_REFRESH_TTL ?? "7d",
-  corsOrigin: process.env.CORS_ORIGIN ?? ["https://campus-resource-arev.vercel.app", "http://localhost:3000", "http://localhost:5173"],
+  corsOrigin: parseCorsOrigin(process.env.CORS_ORIGIN),
   smtpHost: process.env.SMTP_HOST ?? "",
   smtpPort,
   smtpSecure: process.env.SMTP_SECURE === "true",
