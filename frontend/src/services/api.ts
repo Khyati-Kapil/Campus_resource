@@ -24,6 +24,13 @@ export const apiRequest = async <T>(
     throw new Error(`Cannot reach API at ${url}. Check VITE_API_BASE and backend availability/CORS.`);
   }
 
+  if (response.status === 401) {
+    // Avoid noisy loops when an old/invalid token is stored.
+    localStorage.removeItem("campussync_access_token");
+    localStorage.removeItem("campussync_user");
+    throw new Error("Session expired or unauthorized. Please log in again.");
+  }
+
   if (
     path.startsWith("/audit") &&
     init?.headers &&

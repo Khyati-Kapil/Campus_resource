@@ -37,7 +37,8 @@ export default function App() {
 
 
   useEffect(() => {
-    if (!token) return;
+    // Don't open sockets until we have a valid session and we are inside the app shell.
+    if (!token || !user || location.pathname.startsWith("/auth")) return;
     
     const socket = io(API_BASE.replace("/api", ""), { 
       auth: { token } 
@@ -50,7 +51,7 @@ export default function App() {
     return () => {
       socket.disconnect();
     };
-  }, [token, addNotification]);
+  }, [token, user?.id, location.pathname, addNotification]);
 
 
   useEffect(() => {
