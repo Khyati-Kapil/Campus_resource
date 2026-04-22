@@ -1,11 +1,12 @@
 import { prisma } from "../config/prisma.js";
+import { Prisma } from "@prisma/client";
 
 export type ResourceCreateInput = {
   name: string;
   type: "CLASSROOM" | "LABORATORY" | "EQUIPMENT";
   location: string;
   capacity: number;
-  attributes?: Record<string, unknown> | null;
+  attributes?: Prisma.InputJsonValue | null;
 };
 
 export class ResourceRepository {
@@ -18,6 +19,11 @@ export class ResourceRepository {
   }
 
   async create(data: ResourceCreateInput) {
-    return prisma.resource.create({ data });
+    return prisma.resource.create({
+      data: {
+        ...data,
+        attributes: typeof data.attributes === "undefined" ? undefined : data.attributes
+      }
+    });
   }
 }

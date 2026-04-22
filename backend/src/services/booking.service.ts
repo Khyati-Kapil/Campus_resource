@@ -55,17 +55,22 @@ export class BookingService {
     }
 
     const hasConflict = await this.conflictService.checkConflict(String(payload.resourceId), startTime, endTime);
-    if (hasConflict) {
-      throw new AppError(409, "BOOKING_CONFLICT", "Requested slot overlaps an existing booking");
-    }
+    const slotKey = `${String(payload.resourceId)}:${startTime.toISOString()}:${endTime.toISOString()}`;
 
-    const booking = await this.repo.create({
-      resourceId: String(payload.resourceId),
-      requesterId: user.id,
-      startTime,
-      endTime,
-      status: "PENDING",
-      purpose: payload.purpose ? String(payload.purpose) : null
+    const booking = await this.conflictService.withSlotLock(slotKey, async () => {
+      const conflictNow = hasConflict || (await this.conflictService.checkConflict(String(payload.resourceId), startTime, endTime));
+      if (conflictNow) {
+        throw new AppError(409, "BOOKING_CONFLICT", "Requested slot overlaps an existing booking");
+      }
+
+      return this.repo.create({
+        resourceId: String(payload.resourceId),
+        requesterId: user.id,
+        startTime,
+        endTime,
+        status: "PENDING",
+        purpose: payload.purpose ? String(payload.purpose) : null
+      });
     });
 
     await this.eventBus.publish({
@@ -108,10 +113,17 @@ export class BookingService {
       throw new AppError(400, "VALIDATION_ERROR", "Invalid to date");
     }
 
+    const requesterId =
+      user.role === "STUDENT"
+        ? user.id
+        : query.requesterId
+          ? String(query.requesterId)
+          : undefined;
+
     const { items, total } = await this.repo.list({
       status: query.status as "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | undefined,
       resourceId: query.resourceId ? String(query.resourceId) : undefined,
-      requesterId: query.requesterId ? String(query.requesterId) : undefined,
+      requesterId,
       from,
       to,
       skip,

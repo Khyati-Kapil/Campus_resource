@@ -1,130 +1,111 @@
-# Stock Portfolio Risk Analyzer ER Diagram (Revised)
+# CampusSync ER Diagram
 
 ```mermaid
 erDiagram
     USERS {
-        uuid user_id PK
-        string full_name
+        string id PK "ObjectId"
+        string name
         string email UK
-        datetime created_at
+        string passwordHash
+        string role "STUDENT|FACULTY|ADMIN"
+        string department "nullable"
+        string externalId "nullable (studentId/facultyId/adminId)"
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
     }
 
-    PORTFOLIOS {
-        uuid portfolio_id PK
-        uuid user_id FK
+    RESOURCES {
+        string id PK "ObjectId"
         string name
-        string base_currency
-        datetime created_at
+        string type "CLASSROOM|LABORATORY|EQUIPMENT"
+        string location
+        int capacity
+        boolean isActive
+        json attributes "nullable (type-specific fields)"
+        datetime createdAt
+        datetime updatedAt
     }
 
-    ASSETS {
-        uuid asset_id PK
-        string ticker UK
-        string name
-        string asset_type "EQUITY|ETF|BOND|CRYPTO"
-        string exchange
-        string currency
+    BOOKINGS {
+        string id PK "ObjectId"
+        string resourceId FK
+        string requesterId FK
+        datetime startTime
+        datetime endTime
+        string status "PENDING|APPROVED|REJECTED|CANCELLED"
+        string purpose "nullable"
+        string slotKey "resourceId:start:end"
+        int version
+        datetime createdAt
+        datetime updatedAt
     }
 
-    TRANSACTIONS {
-        uuid transaction_id PK
-        uuid portfolio_id FK
-        uuid asset_id FK
-        date trade_date
-        string side "BUY|SELL"
-        decimal quantity
-        decimal price
-        decimal fees
+    APPROVALS {
+        string id PK "ObjectId"
+        string bookingId FK
+        string approverId FK
+        string status "PENDING|APPROVED|REJECTED"
+        int levelOrder
+        string comment "nullable"
+        datetime decidedAt "nullable"
+        datetime createdAt
     }
 
-    HOLDINGS_SNAPSHOT {
-        uuid snapshot_id PK
-        uuid portfolio_id FK
-        uuid asset_id FK
-        date snapshot_date
-        decimal quantity
-        decimal market_value
-        decimal weight
+    NOTIFICATIONS {
+        string id PK "ObjectId"
+        string userId FK
+        string bookingId FK "nullable"
+        string channel "EMAIL|IN_APP"
+        string template
+        string status "QUEUED|SENT|FAILED"
+        datetime scheduledAt "nullable"
+        datetime sentAt "nullable"
+        int retryCount
+        datetime createdAt
     }
 
-    PRICE_HISTORY {
-        uuid price_id PK
-        uuid asset_id FK
-        date price_date
-        decimal close_price
-        decimal adjusted_close
-        bigint volume
+    AUDITLOGS {
+        string id PK "ObjectId"
+        string actorId FK
+        string action
+        string entityType
+        string entityId
+        json metadata "nullable"
+        string requestId "nullable"
+        datetime createdAt
     }
 
-    BENCHMARKS {
-        uuid benchmark_id PK
-        string symbol UK
-        string name
-        string currency
+    REFRESHTOKENS {
+        string id PK "ObjectId"
+        string userId FK
+        string tokenHash UK
+        datetime expiresAt
+        datetime revokedAt "nullable"
+        datetime createdAt
     }
 
-    BENCHMARK_RETURNS {
-        uuid benchmark_return_id PK
-        uuid benchmark_id FK
-        date return_date
-        decimal daily_return
-    }
-
-    RISK_RUNS {
-        uuid risk_run_id PK
-        uuid portfolio_id FK
-        date as_of_date
-        string frequency "DAILY|WEEKLY|MONTHLY"
-        int lookback_days
-        string method "HISTORICAL|PARAMETRIC|MONTE_CARLO"
-        datetime computed_at
-    }
-
-    RISK_METRICS {
-        uuid metric_id PK
-        uuid risk_run_id FK
-        decimal portfolio_value
-        decimal volatility
-        decimal beta
-        decimal sharpe_ratio
-        decimal var_95
-        decimal cvar_95
-        decimal max_drawdown
-    }
-
-    STRESS_SCENARIOS {
-        uuid scenario_id PK
-        string name
-        string shock_type "MARKET|SECTOR|ASSET"
-        decimal shock_percent
-    }
-
-    STRESS_RESULTS {
-        uuid stress_result_id PK
-        uuid risk_run_id FK
-        uuid scenario_id FK
-        decimal projected_pnl
-        decimal projected_drawdown
-    }
-
-    USERS ||--o{ PORTFOLIOS : owns
-    PORTFOLIOS ||--o{ TRANSACTIONS : records
-    ASSETS ||--o{ TRANSACTIONS : traded_in
-    PORTFOLIOS ||--o{ HOLDINGS_SNAPSHOT : captures
-    ASSETS ||--o{ HOLDINGS_SNAPSHOT : valued_as
-    ASSETS ||--o{ PRICE_HISTORY : has_prices
-    BENCHMARKS ||--o{ BENCHMARK_RETURNS : has_returns
-    PORTFOLIOS ||--o{ RISK_RUNS : evaluated_by
-    RISK_RUNS ||--|| RISK_METRICS : outputs
-    RISK_RUNS ||--o{ STRESS_RESULTS : stress_tested
-    STRESS_SCENARIOS ||--o{ STRESS_RESULTS : defines
+    USERS ||--o{ BOOKINGS : requests
+    RESOURCES ||--o{ BOOKINGS : reserved_for
+    BOOKINGS ||--o{ APPROVALS : has
+    USERS ||--o{ APPROVALS : decides
+    USERS ||--o{ NOTIFICATIONS : receives
+    BOOKINGS ||--o{ NOTIFICATIONS : triggers
+    USERS ||--o{ AUDITLOGS : performs
+    USERS ||--o{ REFRESHTOKENS : holds
 ```
 
-## Notes
-- Prefer calculating holdings from `TRANSACTIONS`; `HOLDINGS_SNAPSHOT` is for fast reads/reporting.
-- Enforce unique keys:
+## Constraints & Indexing (MongoDB + Prisma)
+- Unique constraints:
   - `USERS.email`
-  - `ASSETS.ticker`
-  - `PRICE_HISTORY(asset_id, price_date)`
-  - `BENCHMARK_RETURNS(benchmark_id, return_date)`
-- Store one `RISK_METRICS` row per `RISK_RUNS` row.
+  - `REFRESHTOKENS.tokenHash`
+- High-impact indexes:
+  - `BOOKINGS(resourceId, startTime, endTime, status)` for overlap detection
+  - `BOOKINGS(requesterId, createdAt)` for user timelines
+  - `APPROVALS(bookingId, levelOrder, status)` for workflow state
+  - `NOTIFICATIONS(userId, status, scheduledAt)` for async dispatch
+  - `AUDITLOGS(entityType, entityId, createdAt)` for governance queries
+- Double-booking prevention:
+  - Business-rule overlap query: `startTime < requestedEnd AND endTime > requestedStart` for active statuses (`PENDING`, `APPROVED`)
+  - Concurrency protection: `slotKey` used as a lock key (application-level), plus optimistic `version` on updates
+

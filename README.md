@@ -72,7 +72,7 @@ Create a `.env` in `backend/` based on `.env.example`:
 |---|---|---|
 | `NODE_ENV` | Environment mode | `development` |
 | `PORT` | API server port | `4000` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/campussync` |
+| `DATABASE_URL` | MongoDB connection string (Prisma) | `mongodb://127.0.0.1:27017/campussync` |
 | `JWT_ACCESS_SECRET` | Secret for signing access tokens | — |
 | `JWT_REFRESH_SECRET` | Secret for signing refresh tokens | — |
 | `JWT_ACCESS_TTL` | Access token expiry | `15m` |
@@ -91,11 +91,14 @@ Frontend env (optional):
 
 ```
 ├── backend/
-│   └── src/saas/
-│       ├── routes/         # auth, bookings, resources, analytics, audit, notifications
-│       ├── services/       # business logic
-│       ├── middlewares/     # auth, role guards, error handling
-│       ├── config/         # env, db, logger
+│   └── src/
+│       ├── controllers/    # request handlers (MVC controller layer)
+│       ├── routes/         # route modules mounted under /api
+│       ├── services/       # business logic (use-cases)
+│       ├── repositories/   # Prisma/Mongo data access
+│       ├── middlewares/    # auth, RBAC, validation, error handling
+│       ├── events/         # event bus + async handlers
+│       ├── config/         # env, prisma, jwt, logger
 │       ├── app.ts          # Express app factory
 │       └── server.ts       # Entry point
 ├── frontend/
@@ -152,7 +155,6 @@ Frontend env (optional):
 cd backend
 npm run test
 ```
-
 
 
 

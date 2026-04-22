@@ -1,5 +1,6 @@
 import { DomainEvent } from "../event-bus.js";
 import { AuditLogRepository } from "../../repositories/audit-log.repository.js";
+import { Prisma } from "@prisma/client";
 
 const auditRepo = new AuditLogRepository();
 
@@ -15,6 +16,6 @@ export const auditHandler = async (event: DomainEvent) => {
     action: event.type,
     entityType: "BOOKING",
     entityId,
-    metadata: event.payload
+    metadata: event.payload as Prisma.InputJsonValue
   });
 };

@@ -37,7 +37,7 @@ export const createApp = () => {
   eventBus.subscribe(BookingEvents.CANCELLED, auditHandler);
   eventBus.subscribe(BookingEvents.CANCELLED, analyticsHandler);
 
-  app.use("/api/v1", routes);
+  app.use("/api", routes);
   app.use(errorMiddleware);
 
   return app;

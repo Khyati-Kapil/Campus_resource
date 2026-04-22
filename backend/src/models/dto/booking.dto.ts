@@ -20,7 +20,16 @@ export const decisionSchema = z.object({
     bookingId: z.string().min(5)
   }),
   body: z.object({
-    comment: z.string().optional()
+    comment: z.string().optional(),
+    reason: z.string().optional()
+  })
+});
+
+export const conflictCheckSchema = z.object({
+  query: z.object({
+    resourceId: z.string().min(5),
+    startTime: z.string(),
+    endTime: z.string()
   })
 });
 

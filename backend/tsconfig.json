@@ -11,5 +11,6 @@
     "skipLibCheck": true,
     "noImplicitAny": true
   },
-  "include": ["src/saas/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/saas/**"]
 }

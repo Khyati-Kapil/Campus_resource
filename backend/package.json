@@ -5,10 +5,10 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/saas/server.ts",
-    "dev:legacy": "tsx watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "dev:saas": "tsx watch src/saas/server.ts",
     "build": "tsc",
-    "start": "node dist/saas/server.js",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",

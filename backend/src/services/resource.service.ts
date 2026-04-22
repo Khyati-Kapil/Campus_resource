@@ -1,5 +1,6 @@
 import { ResourceRepository } from "../repositories/resource.repository.js";
 import { AppError } from "../utils/app-error.js";
+import { Prisma } from "@prisma/client";
 
 const repo = new ResourceRepository();
 
@@ -18,7 +19,7 @@ export class ResourceService {
       type: String(payload.type) as "CLASSROOM" | "LABORATORY" | "EQUIPMENT",
       location: String(payload.location),
       capacity: Number(payload.capacity),
-      attributes: (payload.attributes as Record<string, unknown>) ?? null
+      attributes: (payload.attributes as Prisma.InputJsonValue) ?? null
     });
   }
 }

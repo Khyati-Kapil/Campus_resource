@@ -4,10 +4,15 @@ import { BookingEvents } from "../events/booking.events.js";
 import { ApprovalRepository } from "../repositories/approval.repository.js";
 import { BookingRepository } from "../repositories/booking.repository.js";
 
-const approvalRepo = new ApprovalRepository();
-const bookingRepo = new BookingRepository();
-
 export class ApprovalService {
+  private approvalRepo: ApprovalRepository;
+  private bookingRepo: BookingRepository;
+
+  constructor(deps?: { approvalRepo?: ApprovalRepository; bookingRepo?: BookingRepository }) {
+    this.approvalRepo = deps?.approvalRepo ?? new ApprovalRepository();
+    this.bookingRepo = deps?.bookingRepo ?? new BookingRepository();
+  }
+
   async approve(bookingId: string, user?: { id: string; role: string }, payload?: Record<string, unknown>) {
     if (!user) {
       throw new AppError(401, "UNAUTHORIZED", "Login required");
@@ -17,7 +22,7 @@ export class ApprovalService {
       throw new AppError(400, "VALIDATION_ERROR", "Booking id required");
     }
 
-    const booking = await bookingRepo.findById(bookingId);
+    const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) {
       throw new AppError(404, "NOT_FOUND", "Booking not found");
     }
@@ -26,14 +31,14 @@ export class ApprovalService {
       throw new AppError(409, "INVALID_STATE", "Booking is not pending");
     }
 
-    const approval = await approvalRepo.create({
+    const approval = await this.approvalRepo.create({
       bookingId,
       approverId: user.id,
       status: "APPROVED",
-      comment: payload?.comment ? String(payload.comment) : null
+      comment: payload?.comment ? String(payload.comment) : payload?.reason ? String(payload.reason) : null
     });
 
-    const updated = await bookingRepo.updateStatus(bookingId, "APPROVED", booking.version);
+    const updated = await this.bookingRepo.updateStatus(bookingId, "APPROVED", booking.version);
 
     await eventBus.publish({
       type: BookingEvents.APPROVED,
@@ -53,7 +58,7 @@ export class ApprovalService {
       throw new AppError(400, "VALIDATION_ERROR", "Booking id required");
     }
 
-    const booking = await bookingRepo.findById(bookingId);
+    const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) {
       throw new AppError(404, "NOT_FOUND", "Booking not found");
     }
@@ -62,14 +67,14 @@ export class ApprovalService {
       throw new AppError(409, "INVALID_STATE", "Booking is not pending");
     }
 
-    const approval = await approvalRepo.create({
+    const approval = await this.approvalRepo.create({
       bookingId,
       approverId: user.id,
       status: "REJECTED",
-      comment: payload?.comment ? String(payload.comment) : null
+      comment: payload?.comment ? String(payload.comment) : payload?.reason ? String(payload.reason) : null
     });
 
-    const updated = await bookingRepo.updateStatus(bookingId, "REJECTED", booking.version);
+    const updated = await this.bookingRepo.updateStatus(bookingId, "REJECTED", booking.version);
 
     await eventBus.publish({
       type: BookingEvents.REJECTED,

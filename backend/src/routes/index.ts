@@ -17,6 +17,8 @@ router.use("/bookings", bookingRoutes);
 router.use("/approvals", approvalRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/notifications", notificationRoutes);
+router.use("/audit", auditRoutes);
+// Back-compat alias for earlier path naming.
 router.use("/audit-logs", auditRoutes);
 
 export default router;
